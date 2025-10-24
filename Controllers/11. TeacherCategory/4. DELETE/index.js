@@ -1,0 +1,53 @@
+const prisma = require('../../../Middlewares/prisma')
+
+const DELETE_TEACHER_CATEGORY = async (req, res) => {
+    try 
+    {
+        const {id} = req.params;
+        
+        if(!id || isNaN(id) || id === undefined)
+        {
+            return res.status(403).json({
+                success:false,
+                data:[],
+                message: "Хүсэлтийн мэдээлэл дутуу байна эсвэл буруу байна."
+            })
+        }
+        const teacherCategory = await prisma.teacher_category.findUnique({
+            where: {
+                id: parseInt(id)
+            }
+        })
+
+        if(!teacherCategory)
+        {
+            return res.status(404).json({
+                success:false,
+                data:[],
+                message: "Мэдээлэл олдсонгүй."
+        })}
+        
+        const result = await prisma.teacher_category.delete({
+            where: {
+                id:parseInt(id)
+            }
+        })
+        
+        return res.status(200).json({
+            success:true,
+            data:result,
+            message: "Амжилттай"
+        })
+        
+    }    
+    catch(err)
+    {
+        return res.status(500).json({
+            success:false,
+            data:[],
+            message: "Серверийн алдаа гарлаа." + err
+        })
+    }
+}
+
+module.exports = DELETE_TEACHER_CATEGORY
