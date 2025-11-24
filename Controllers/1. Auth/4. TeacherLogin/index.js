@@ -32,6 +32,9 @@ const LOGIN_TEACHER = async (req, res) => {
             where: {
               kode: kode,
             },
+            include:{
+                teacher_category_teacher_category_teacherToteacher:true
+            }
         });
 
         if(!teacher)
@@ -63,15 +66,16 @@ const LOGIN_TEACHER = async (req, res) => {
         const data = {
             id: teacher.id,
             kode: teacher.kode,
-            role:"teacher"
+            role:"teacher",
+            category: teacher.teacher_category_teacher_category_teacherToteacher.category
         }
 
         const token = jwt.sign(data, key, {expiresIn: expiresIn})
 
         const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Production дээр л secure
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Development дээр 'lax'
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',  
             maxAge: 12 * 60 * 60 * 1000,
             path: '/'
         }
@@ -79,7 +83,6 @@ const LOGIN_TEACHER = async (req, res) => {
         // 7. Cookie тавих
         res.cookie('auth_token', token, cookieOptions)
 
-        // 8. Response буцаах
         return res.status(200).json({
             success: true,
             data: token,

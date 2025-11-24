@@ -33,28 +33,78 @@ const UPDATE_USERS = async (req , res) => {
             })
         }
 
-        const {firstName, lastName, register, username, password, role, endDate} = req.body;
-
-
-        console.log(req.body)
+        const {
+            familyName,
+            firstname,
+            lastname,
+            birthdate,
+            register,
+            gender,
+            blood_type,
+            city,
+            district,
+            hayg,
+            facebook,
+            phone,
+            phoneTwo,
+            password,
+            role,
+            endDate
+        } = req.body;
 
         let updateData = {}
 
-        if(firstName)
+        if(familyName)
         {
-            updateData.first_name = firstName
+            updateData.family_name = familyName
         }
-        if(lastName)
+        if(firstname)
         {
-            updateData.last_name = lastName
+            updateData.first_name = firstname
+        }
+        if(lastname)
+        {
+            updateData.last_name = lastname
+        }
+        if(birthdate)
+        {
+            updateData.birthdate = new Date(birthdate)
         }
         if(register)
         {
             updateData.register = register
         }
-        if(username)
+        if(gender)
         {
-            updateData.username = username
+            updateData.gender = gender
+        }
+        if(blood_type)
+        {
+            updateData.blood_type = blood_type
+        }
+        if(city)
+        {
+            updateData.city = city
+        }
+        if(district)
+        {
+            updateData.district = district
+        }
+        if(hayg)
+        {
+            updateData.address = hayg
+        }
+        if(facebook)
+        {
+            updateData.facebook = facebook
+        }
+        if(phone)
+        {
+            updateData.phone = phone
+        }
+        if(phoneTwo)
+        {
+            updateData.phone_two = phoneTwo
         }
         if(password)
         {
@@ -68,7 +118,7 @@ const UPDATE_USERS = async (req , res) => {
         }
         if(endDate)
         {
-            updateData.end_date = endDate
+            updateData.end_date = new Date(endDate)
         }
 
         if (Object.keys(updateData).length === 0) {
@@ -79,42 +129,26 @@ const UPDATE_USERS = async (req , res) => {
             });
         }
 
-        if(updateData && updateData.username)
-        {
-            const result = await prisma.users.findMany({
-                where:{
-                    username: username
-                }
-            })
-            if(result.length > 0)
-            {
-                return res.status(403).json({
-                    success:false,
-                    data:[],
-                    message: "Хэрэглэгчийн нэр бүртгэгдсэн байна."
-                })
-            }
-        }
-
-        const result = await prisma.users.update({
+        const updatedUser = await prisma.users.update({
             where: {
                 id:parseInt(id)
             },
-            data: updateData
+            data: updateData,
         })
 
         return res.status(200).json({
             success:true,
-            data:[],
+            data: updatedUser,
             message: "Амжилттай шинэчиллээ"
         })
     }
     catch(err)
     {
+        console.error("UPDATE_USERS Error:", err)
         return res.status(500).json({
             success:false,
             data:[],
-            message: "Серверийн алдаа гарлаа." + err
+            message: "Серверийн алдаа гарлаа: " + err.message
         })
     }
 }

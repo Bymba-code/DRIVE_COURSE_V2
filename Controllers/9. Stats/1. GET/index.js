@@ -3,10 +3,8 @@ const prisma = new PrismaClient()
 
 const GET_ALL_STATS = async (req, res) => {
     try {
-        // 1. Нийт хэрэглэгчдийн тоо
         const totalUsers = await prisma.users.count()
 
-        // 2. Нийт өгсөн тест (exam_test)
         const totalExamsCompleted = await prisma.exam_test.count()
 
         // 3. Өнөөдрийн огноо бэлтгэх
@@ -22,7 +20,7 @@ const GET_ALL_STATS = async (req, res) => {
                     gte: today,
                     lt: tomorrow
                 }
-            }
+            },
         })
 
         // 5. Амжилтын хувь тооцоолох (isSuccess = 1)
@@ -91,7 +89,46 @@ const GET_ALL_STATS = async (req, res) => {
             }
         })
 
-        // 11. Ангилал бүрийн тест тоо
+        // 11. ӨНӨӨДӨР ӨГСӨН ШАЛГАЛТУУД (шинээр нэмсэн)
+        const todayExams = await prisma.exam.findMany({
+            where: {
+                date: {
+                    gte: today,
+                    lt: tomorrow
+                },
+                isMake: 1  // Дууссан шалгалтууд
+            },
+            orderBy: {
+                date: 'desc'
+            },
+            include: {
+                users: {
+                    select: {
+                        id: true,
+                        first_name: true,
+                        last_name: true,
+                        username: true
+                    }
+                },
+                examTest: {
+                    take: 1,
+                    orderBy: {
+                        id: 'desc'
+                    },
+                    include: {
+                        test_exam_test_testTotest: {
+                            select: {
+                                id: true,
+                                name: true,
+                                img: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        // 12. Ангилал бүрийн тест тоо
         const categoryStats = await prisma.category.findMany({
             select: {
                 id: true,
@@ -111,7 +148,7 @@ const GET_ALL_STATS = async (req, res) => {
             }
         })
 
-        // 12. Хамгийн идэвхтэй сурагчид (сүүлийн 30 хоног)
+        // 13. Хамгийн идэвхтэй сурагчид (сүүлийн 30 хоног)
         const thirtyDaysAgo = new Date()
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
@@ -173,6 +210,19 @@ const GET_ALL_STATS = async (req, res) => {
                     testImage: firstTest?.test_exam_test_testTotest?.img || null,
                     userName: exam.users?.first_name || 'N/A',
                     userLastName: exam.users?.last_name || '',
+                    isSuccess: firstTest?.isSuccess === 1,
+                    date: exam.date
+                }
+            }),
+            todayExams: todayExams.map(exam => {
+                const firstTest = exam.examTest && exam.examTest[0]
+                return {
+                    id: exam.id,
+                    testName: firstTest?.test_exam_test_testTotest?.name || 'N/A',
+                    testImage: firstTest?.test_exam_test_testTotest?.img || null,
+                    userName: exam.users?.first_name || 'N/A',
+                    userLastName: exam.users?.last_name || '',
+                    username: exam.users?.username || 'N/A',
                     isSuccess: firstTest?.isSuccess === 1,
                     date: exam.date
                 }

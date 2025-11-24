@@ -1,7 +1,31 @@
 const prisma = require("../../../Middlewares/prisma");
 const bcrypt = require("bcrypt");
 
-const STUDENT_REGISTER = async (req, res) => {
+async function generateUsername() {
+  const PREFIX = "AZ01D";
+
+  const lastUser = await prisma.users.findFirst({
+    where: {
+      username: { startsWith: PREFIX }
+    },
+    orderBy: { id: "desc" },
+    select: { username: true }
+  });
+
+  // Хэрэв ийм форматаар эхэлсэн хэрэглэгч байхгүй бол:
+  if (!lastUser) {
+    return PREFIX + "001";   // Эхний хэрэглэгч
+  }
+
+  // Хэрэв байгаа бол дугаар авна
+  const match = lastUser.username.match(/(\d{3})$/);
+  const lastNumber = match ? parseInt(match[1], 10) : 0;
+
+  const nextNumber = (lastNumber + 1).toString().padStart(3, "0");
+  return PREFIX + nextNumber;
+}
+
+const STUDENT_REGISTER_V2 = async (req, res) => {
     try {
         const {
             familyName,
@@ -18,8 +42,7 @@ const STUDENT_REGISTER = async (req, res) => {
             phone,
             medeelel,
             phoneTwo,
-            
-
+            category
         } = req.body;
 
         if (!familyName) {
@@ -91,8 +114,16 @@ const STUDENT_REGISTER = async (req, res) => {
             });
         }
 
-        const rawPassword = register.slice(-4);
-        const hashedPassword = await bcrypt.hash(rawPassword, 10);
+        const kode = await generateUsername()
+        console.log(kode)
+
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(kode, salt)
+
+        const endDate = new Date();
+        endDate.setMonth(endDate.getMonth() + 3); 
+
+
 
         const newStudent = await prisma.users.create({
             data: {
@@ -111,8 +142,22 @@ const STUDENT_REGISTER = async (req, res) => {
                 phonetwo: phoneTwo,
                 medeelel_awsan: parseInt(medeelel),
                 password: hashedPassword,
+                username:kode,
+                create_date: new Date(),
+                role:"student",
+                end_date: new Date(endDate)
+                
             },
         });
+
+
+        const addCategory = await prisma.user_category.create({
+            data: {
+                user: parseInt(newStudent.id),
+                category: parseInt(category),
+                date: new Date()
+            }
+        })
 
         return res.status(201).json({
             success: true,
@@ -130,4 +175,4 @@ const STUDENT_REGISTER = async (req, res) => {
     }
 };
 
-module.exports = STUDENT_REGISTER;
+module.exports = STUDENT_REGISTER_V2;
