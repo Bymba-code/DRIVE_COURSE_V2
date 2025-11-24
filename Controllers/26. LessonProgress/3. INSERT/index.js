@@ -1,54 +1,43 @@
 const prisma = require("../../../Middlewares/prisma");
 
-const INSERT_LESSON_VIDEOS = async (req, res) => {
+const INSERT_LESSON_VIDEOS_PROGRESS = async (req, res) => {
     try {
-        const { lesson, title , index, file} = req.body;
+        const user = req.user;
+
+
+        const { lesson, video} = req.body;
 
         if(!lesson)
         {
             return res.status(403).json({
                 success:false,
                 data:[],
-                message: "Хамаарах хичээлийг сонгоно уу."
+                message: "Хамаарах хичээлийг оруулна уу."
             })
         }
-        if(!title)
+        if(!video)
         {
             return res.status(403).json({
                 success:false,
                 data:[],
-                message: "Гарчиг оруулна уу."
-            })
-        }
-        if(!index)
-        {
-            return res.status(403).json({
-                success:false,
-                data:[],
-                message: "Хичээлийн дараалал оруулна уу."
-            })
-        }
-        if(!file)
-        {
-            return res.status(403).json({
-                success:false,
-                data:[],
-                message: "Бичлэгний URL оруулна уу."
+                message: "Бичлэг оруулна уу."
             })
         }
 
-        const result = await prisma.lesson_videos.create({
-            data: {
-                lesson: parseInt(lesson),
-                title: title,
-                index: parseInt(index),
-                file: file
-            }
+        const result = await prisma.lesson_progress.create({
+        data: {
+            user: parseInt(user.id),
+            lesson:parseInt(lesson),
+            video:parseInt(video),
+            progress:100,
+            completed:1,
+            updated_at: new Date()
+        }
         })
 
-        return res.status(403).json({
+        return res.status(200).json({
             success:true,
-            data:result,
+            data:[],
             message: "Амжилттай."
         })
 
@@ -57,4 +46,4 @@ const INSERT_LESSON_VIDEOS = async (req, res) => {
     }
 };
 
-module.exports = INSERT_LESSON_VIDEOS;
+module.exports = INSERT_LESSON_VIDEOS_PROGRESS;

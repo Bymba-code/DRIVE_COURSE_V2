@@ -46,7 +46,7 @@ const INSERT_LESSON_VIDEOS = async (req, res) => {
             }
         })
 
-        return res.status(403).json({
+        return res.status(200).json({
             success:true,
             data:result,
             message: "Амжилттай."

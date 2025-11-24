@@ -14,13 +14,19 @@ const GET_ALL_LESSONS = async (req , res) => {
             lessons = await prisma.lessons.findMany({
                 skip:skip,
                 take:take,
+                include: {
+                    _count:prisma.lesson_videos
+                }
             })
         }
 
         if(!page && !size)
         {
             lessons = await prisma.lessons.findMany({
-               
+                include: {
+                    _count:true
+                },
+                
             })
         }
 

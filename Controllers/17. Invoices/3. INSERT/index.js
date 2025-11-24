@@ -4,7 +4,6 @@ const storePayGateway = new StorePayGateway();
 
 const INSERT_INVOICES = async (req, res) => {
   try {
-
     const { amount, category, mobileNumber } = req.body 
     
     const payload = { 
@@ -12,16 +11,16 @@ const INSERT_INVOICES = async (req, res) => {
       mobileNumber: mobileNumber,
       description: "Нэхэмжлэлийн төлбөр",
       amount: parseInt(amount),
-      
     }
 
+    const externalInvoice = await storePayGateway.createInvoice(payload);
 
-      const externalInvoice = await storePayGateway.createInvoice(payload);
-
-      
-
+  
     return res.status(201).json({
       success: true,
+      data:{
+        invoice:"123"
+      },
       message: "Нэхэмжлэл амжилттай үүсгэгдлээ.",
     });
 
