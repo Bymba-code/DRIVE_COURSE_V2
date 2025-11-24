@@ -8,6 +8,7 @@ const INSERT_CATEGORY = require("../../Controllers/2. Category/3. INSERT")
 const DELETE_CATEGORY = require("../../Controllers/2. Category/4. DELETE")
 const UPDATE_CATEGORY = require("../../Controllers/2. Category/5. UPDATE")
 const authMiddleware = require("../../Middlewares/authCookie")
+const GET_ALL_CATEGORIES = require("../../Controllers/2. Category/6. GETALL")
 
 const router = express.Router()
 
@@ -20,5 +21,8 @@ router.route("/category/:id")
 .get(GET_SINGLE_CATEGORY)
 .delete(authMiddleware, Authorize(["admin"]), DELETE_CATEGORY)
 .put(authMiddleware, Authorize(["admin", "student"]) , UPDATE_CATEGORY)
+
+router.route("/categories")
+.get(GET_ALL_CATEGORIES)
 
 module.exports = router

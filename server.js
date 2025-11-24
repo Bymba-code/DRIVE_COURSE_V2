@@ -35,6 +35,7 @@ const commentRoutes = require("./routes/28. Comment")
 const replyRoutes = require('./routes/29. Reply')
 const reactionRoutes = require('./routes/30. Reactions')
 const profileRoutes = require("./routes/31. Profile")
+const leaderboardRoutes = require("./routes/32. Leaderboards")
 
 
 const app = express()
@@ -43,6 +44,7 @@ const corsOptions = {
     origin: [
         "http://localhost:5173",
         "http://localhost:5174",
+        "http://localhost:5175",
         "https://omn1club.com",
         "https://system.tsogttsug.com",
         "http://system.tsogttsug.com",
@@ -93,6 +95,7 @@ app.use("/api/v1", commentRoutes)
 app.use("/api/v1", replyRoutes)
 app.use("/api/v1", reactionRoutes)
 app.use("/api/v1", profileRoutes)
+app.use("/api/v1", leaderboardRoutes)
 
 
 

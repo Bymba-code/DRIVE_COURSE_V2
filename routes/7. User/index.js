@@ -9,6 +9,7 @@ const DELETE_USERS = require("../../Controllers/7. Users/4. DELETE")
 const UPDATE_USERS = require("../../Controllers/7. Users/5. UPDATE")
 const USERS_ME = require("../../Controllers/7. Users/6. ME")
 const authMiddleware = require("../../Middlewares/authCookie")
+const REGISTER_USER = require("../../Controllers/7. Users/7. Register")
 
 const router = express.Router()
 
@@ -23,5 +24,8 @@ router.route("/users/:id")
 
 router.route("/user/me")
 .get(authMiddleware ,USERS_ME)
+
+router.route("/user/register")
+.post(REGISTER_USER)
 
 module.exports = router
