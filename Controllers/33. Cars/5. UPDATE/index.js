@@ -1,23 +1,24 @@
 const prisma = require("../../../Middlewares/prisma");
 
-const UPDATE_LESSON_PROGRESS = async (req, res) => {
+const UPDATE_CARS = async (req, res) => {
   try {
     const { id } = req.params;
-    const { success , wrong} = req.body;
+    const { vechile, number } = req.body;
 
-
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: "ID параметр заавал шаардлагатай.",
-      });
+    if(!id || isNaN(id))
+    {
+      return res.status(403).json({
+        success:false,
+        data:[],
+        message: "Хүсэлтийн мэдээлэл дутуу эсвэл буруу байна."
+      })
     }
-
-    const existingVideo = await prisma.lesson_progress.findUnique({
+    
+    const data = await prisma.cars.findUnique({
       where: { id: parseInt(id) },
     });
 
-    if (!existingVideo) {
+    if (!data) {
       return res.status(404).json({
         success: false,
         message: "Өгөгдөл олдсонгүй.",
@@ -26,9 +27,8 @@ const UPDATE_LESSON_PROGRESS = async (req, res) => {
 
     let updateData = {};
 
-    if (success !== undefined) updateData.success = parseInt(success);
-    if (wrong !== undefined) updateData.wrong = parseInt(wrong);
-
+    if (vechile !== undefined) updateData.vechile = vechile;
+    if (number !== undefined) updateData.number = number;
 
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({
@@ -37,7 +37,7 @@ const UPDATE_LESSON_PROGRESS = async (req, res) => {
       });
     }
 
-    const result = await prisma.lesson_progress.update({
+    const result = await prisma.cars.update({
       where: { id: parseInt(id) },
       data: updateData,
     });
@@ -56,4 +56,4 @@ const UPDATE_LESSON_PROGRESS = async (req, res) => {
   }
 };
 
-module.exports = UPDATE_LESSON_PROGRESS;
+module.exports = UPDATE_CARS;
