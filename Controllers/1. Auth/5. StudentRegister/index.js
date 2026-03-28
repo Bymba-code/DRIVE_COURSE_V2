@@ -1,7 +1,30 @@
 const prisma = require("../../../Middlewares/prisma");
 const bcrypt = require("bcrypt");
 
-const STUDENT_REGISTER = async (req, res) => {
+async function generateUsername() {
+  const PREFIX = "AZ01D";
+
+  const lastUser = await prisma.users.findFirst({
+    where: {
+      username: { startsWith: PREFIX }
+    },
+    orderBy: { id: "desc" },
+    select: { username: true }
+  });
+
+  if (!lastUser) {
+    return PREFIX + "001";  
+  }
+
+  // Хэрэв байгаа бол дугаар авна
+  const match = lastUser.username.match(/(\d{3})$/);
+  const lastNumber = match ? parseInt(match[1], 10) : 0;
+
+  const nextNumber = (lastNumber + 1).toString().padStart(3, "0");
+  return PREFIX + nextNumber;
+}
+
+const STUDENT_REGISTER_V2 = async (req, res) => {
     try {
         const {
             familyName,
@@ -13,13 +36,14 @@ const STUDENT_REGISTER = async (req, res) => {
             blood_type,
             city,
             district,
+            ward,
             hayg,
             facebook,
             phone,
             medeelel,
             phoneTwo,
-            
-
+            category,
+            payedAmount
         } = req.body;
 
         if (!familyName) {
@@ -58,6 +82,10 @@ const STUDENT_REGISTER = async (req, res) => {
             return res.status(400).json({ success: false, message: "Дүүрэг сонгоно уу." });
         }
 
+        if (!ward) {
+            return res.status(400).json({ success: false, message: "Хороо сонгоно уу." });
+        }
+
         if (!hayg) {
             return res.status(400).json({ success: false, message: "Хаяг оруулна уу." });
         }
@@ -91,8 +119,14 @@ const STUDENT_REGISTER = async (req, res) => {
             });
         }
 
-        const rawPassword = register.slice(-4);
-        const hashedPassword = await bcrypt.hash(rawPassword, 10);
+        const kode = await generateUsername()
+        console.log(kode)
+
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(kode, salt)
+
+        const endDate = new Date();
+        endDate.setMonth(endDate.getMonth() + 3); 
 
         const newStudent = await prisma.users.create({
             data: {
@@ -103,21 +137,56 @@ const STUDENT_REGISTER = async (req, res) => {
                 register,
                 gender: parseInt(gender),
                 blood_type:parseInt(blood_type),
-                city,
-                district,
+                city:parseInt(city),
+                district:parseInt(district),
+                ward:parseInt(ward),
                 hayg,
                 facebook,
                 phone,
                 phonetwo: phoneTwo,
                 medeelel_awsan: parseInt(medeelel),
                 password: hashedPassword,
+                username:kode,
+                create_date: new Date(),
+                role:"student",
+                end_date: new Date(endDate)
+                
             },
         });
 
+        const categoryDB = await prisma.category.findUnique({
+            where:{
+                id:parseInt(category)
+            }
+        })
+
+        const addCategory = await prisma.user_category.create({
+            data: {
+                user: parseInt(newStudent.id),
+                category: parseInt(category),
+                payment: parseInt(categoryDB.price),
+                date: new Date()
+            }
+        })
+
+        if(payedAmount)
+        {
+            const result = await prisma.user_category_payments.create({
+                data: {
+                    user_category:parseInt(addCategory.id),
+                    invoice_id:4124,
+                    status:"paid",
+                    amount:parseInt(payedAmount),
+                    description:"Төлбөр төлсөн байсан",
+                    number:"123",
+                }
+            })
+        }
+
         return res.status(201).json({
             success: true,
-            message: "Оюутан амжилттай бүртгэгдлээ.",
             data: newStudent,
+            message: "Оюутан амжилттай бүртгэгдлээ.",
         });
 
     } catch (err) {
@@ -130,4 +199,4 @@ const STUDENT_REGISTER = async (req, res) => {
     }
 };
 
-module.exports = STUDENT_REGISTER;
+module.exports = STUDENT_REGISTER_V2;

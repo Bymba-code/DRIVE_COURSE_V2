@@ -22,7 +22,11 @@ const GET_SINGLE_DRIVING_SCHELUDE = async (req, res) => {
             include: {
                 teacher_driving_schelude_teacherToteacher:true,
                 category_driving_schelude_categoryTocategory:true,
-                user_driving_schelude:true
+                user_driving_schelude:{
+                    include:{
+                        users:true
+                    }
+                }
             }
         })
         

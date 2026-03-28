@@ -13,7 +13,9 @@ const ME_STUDENT_DRIVING_SCHELUDE = async (req, res) => {
                 driving_schelude:{
                     include: {
                         category_driving_schelude_categoryTocategory:true,
-                        teacher_driving_schelude_teacherToteacher:true
+                        teacher_driving_schelude_teacherToteacher:true,
+                        cars:true,
+                        user_driving_schelude:true
                     }
                 }
             },

@@ -4,36 +4,66 @@ const bcrypt = require('bcrypt'); // 🔒 bcrypt ашиглана
 const UPDATE_STUDENT_DRIVING_SCHELUDE = async (req, res) => {
     try {
         const { id } = req.params;
-        const { attendace, attendance, note } = req.body; // Хоёуланг нь авах
+        const {attendance, note} = req.body;
 
-        // Аль нэг байвал ашиглах
-        const finalAttendance = attendace || attendance;
+
+        if (!id || isNaN(id)) {
+            return res.status(400).json({
+                success: false,
+                data: [],
+                message: "Хүсэлтийн мэдээлэл дутуу байна эсвэл буруу байна."
+            });
+        }
+
+        // 🔍 Багш байгаа эсэхийг шалгах
+        const student_schelude = await prisma.user_driving_schelude.findUnique({
+            where: { id: parseInt(id) }
+        });
+
+        if (!student_schelude) {
+            return res.status(404).json({
+                success: false,
+                data: [],
+                message: "Хуваарийн мэдээлэл олдсонгүй."
+            });
+        }
 
         const updateData = {};
 
-        if (finalAttendance) updateData.attendance = parseInt(finalAttendance); // Schema-тай тохируулах
-        if (note !== undefined) updateData.note = note;
-        updateData.update_date = new Date();
+        if (attendance) updateData.attendance = parseInt(attendance);
+        if (note) updateData.note = note;
+        updateData.update_date = new Date()
 
+        // 🚫 Хоосон update шалгах
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({
+                success: false,
+                data: [],
+                message: "Шинэчлэх өгөгдөл байхгүй байна."
+            });
+        }
+
+        // 💾 Мэдээллийг шинэчлэх
         const result = await prisma.user_driving_schelude.update({
             where: { id: parseInt(id) },
             data: updateData
         });
 
+        // ✅ Амжилттай хариу
         return res.status(200).json({
             success: true,
             data: result,
-            message: "Амжилттай шинэчиллээ."
+            message: "Амжилттай."
         });
 
     } catch (err) {
-        console.error('UPDATE алдаа:', err);
+        console.error(err);
         return res.status(500).json({
             success: false,
             data: [],
-            message: "Серверийн алдаа: " + err.message
+            message: "Серверийн алдаа гарлаа. " + err.message
         });
     }
 };
 
-module.exports = UPDATE_STUDENT_DRIVING_SCHELUDE
+module.exports = UPDATE_STUDENT_DRIVING_SCHELUDE;

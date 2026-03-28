@@ -23,7 +23,6 @@ const INSERT_STUDENT_DRIVING_SCHELUDE = async (req, res) => {
             })
         }
 
-
         const result = await prisma.user_driving_schelude.create({
             data: {
                 schelude:parseInt(schelude),

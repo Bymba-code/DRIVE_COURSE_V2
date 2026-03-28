@@ -1,4 +1,3 @@
-
 const prisma = require("../../../Middlewares/prisma")
 
 const GET_ALL_USERS = async (req , res) => {
@@ -14,8 +13,21 @@ const GET_ALL_USERS = async (req , res) => {
         {
             users = await prisma.users.findMany({
                 include: {
-                    user_category: true
-                }
+                    user_category: {
+                        include: {
+                            user_category_payments_user_category_payments_user_categoryTouser_category:true
+                        }
+                    },
+                    user_driving_schelude:true,
+                    user_schelude:true,
+                    city_users_cityTocity:true,
+                    district_users_districtTodistrict:true,
+                    wards:true,
+                    bloodtype:true,
+                    gender_users_genderTogender:true,
+                    information:true
+                    
+                },
             })
         }
 
@@ -25,7 +37,20 @@ const GET_ALL_USERS = async (req , res) => {
                 skip:parseInt(skip),
                 take:take,
                 include: {
-                    user_category: true
+                    user_category: {
+                        include: {
+                            user_category_payments_user_category_payments_user_categoryTouser_category:true
+                        }
+                    },
+                    user_driving_schelude:true,
+                    user_schelude:true,
+                    city_users_cityTocity:true,
+                    district_users_districtTodistrict:true,
+                    wards:true,
+                    bloodtype:true,
+                    gender_users_genderTogender:true,
+                    information:true
+                    
                 }
             })
         }
@@ -39,9 +64,18 @@ const GET_ALL_USERS = async (req , res) => {
                 include: {
                     user_category: {
                         include: {
-                            category_user_category_categoryTocategory: true  
+                            user_category_payments_user_category_payments_user_categoryTouser_category:true
                         }
-                    }
+                    },
+                    user_driving_schelude:true,
+                    user_schelude:true,
+                    city_users_cityTocity:true,
+                    district_users_districtTodistrict:true,
+                    wards:true,
+                    bloodtype:true,
+                    gender_users_genderTogender:true,
+                    information:true
+                    
                 },
                 where: {
                     username: {

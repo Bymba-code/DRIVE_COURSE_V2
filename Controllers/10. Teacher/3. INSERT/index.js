@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt")
 const INSERT_TEACHER = async (req, res) => {
     try 
     {
-        const {firstName, lastName, register, kode, password, category} = req.body;
+        const {firstName, lastName, register, kode, password} = req.body;
 
         if(!firstName)
         {
@@ -73,14 +73,6 @@ const INSERT_TEACHER = async (req, res) => {
                 register:register,
                 kode:kode,
                 password:hashed,
-                date: new Date()
-            }
-        })
-
-        const resultCategory = await prisma.teacher_category.create({
-            data:{
-                teacher: parseInt(result.id),
-                category: parseInt(category),
                 date: new Date()
             }
         })

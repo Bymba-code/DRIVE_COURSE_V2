@@ -4,7 +4,7 @@ const primsa = require("../../../Middlewares/prisma")
 const INSERT_CATEGORY = async (req , res) => {
     try 
     {
-        const {name} = req.body;
+        const {name, price, salePrice} = req.body;
 
         if(!name)
         {
@@ -12,6 +12,14 @@ const INSERT_CATEGORY = async (req , res) => {
                 success:false,
                 data:[],
                 message: "Ангилалын нэрийг оруулна уу."
+            })
+        }
+        if(!price)
+        {
+            return res.status(400).json({
+                success:false,
+                data:[],
+                message: "Ангилалын үнэ оруулна уу."
             })
         }
 
@@ -32,7 +40,9 @@ const INSERT_CATEGORY = async (req , res) => {
 
         const result = await prisma.category.create({
             data:{
-                name:name
+                name:name,
+                price:parseInt(price),
+                salePrice: salePrice ? parseInt(salePrice) : salePrice
             }
         })
 

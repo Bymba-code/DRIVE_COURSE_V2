@@ -15,7 +15,7 @@ const GET_ALL_CATEGORY = async (req , res) => {
             {
                 categories = await prisma.category.findMany({
                     skip:parseInt(skip),
-                    take:take
+                    take:take,
                 })
             }
             if(!page && !size)

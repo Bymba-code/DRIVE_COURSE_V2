@@ -3,7 +3,7 @@ const prisma = require('../../../Middlewares/prisma')
 const INSERT_DRIVING_SCHELUDE = async (req, res) => {
     try 
     {
-        const { category, teacher, vechile, area, schelude_date, start_time, end_time, note} = req.body;
+        const { category, teacher, car, area, schelude_date, start_time, note} = req.body;
 
 
         if(!category)
@@ -22,12 +22,12 @@ const INSERT_DRIVING_SCHELUDE = async (req, res) => {
                 message: "Багш сонгоно уу."
             })
         }
-        if(!vechile)
+        if(!car)
         {
             return res.status(403).json({
                 success:false,
                 data:[],
-                message: "Жолооны машины дугаар болон марк оруулна уу."
+                message: "Жолооны машин сонгоно уу."
             })
         }
         if(!area)
@@ -54,25 +54,32 @@ const INSERT_DRIVING_SCHELUDE = async (req, res) => {
                 message: "Эхлэх цаг оруулна уу."
             })
         }
-        if(!end_time)
+
+
+        const existData = await prisma.driving_schelude.findFirst({
+            where:{
+                schelude_date:new Date(schelude_date),
+                start_time: new Date(start_time),
+            }
+        })
+
+        if(existData)
         {
-            return res.status(403).json({
+            return res.status(400).json({
                 success:false,
                 data:[],
-                message: "Дуусах цаг оруулна уу."
+                message: "Автомашины цаг давхцаж байна."
             })
         }
-
 
         const result = await prisma.driving_schelude.create({
             data: {
                 category: parseInt(category),
                 teacher: parseInt(teacher),
-                vechile: vechile,
+                car: parseInt(car),
                 area: area,
                 schelude_date: new Date(schelude_date),
                 start_time: new Date(start_time),
-                end_time: new Date(end_time),
                 note: note ? note : "Байхгүй.",
                 add_date: new Date()
             }

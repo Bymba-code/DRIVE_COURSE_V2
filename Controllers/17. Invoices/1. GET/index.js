@@ -40,10 +40,6 @@ const GET_ALL_INVOICE = async (req, res) => {
 
     // Хэрвээ page, size ирээгүй бол бүгдийг буцаана
     invoices = await prisma.invoices.findMany({
-      include: {
-        users: true,
-        payments:true
-      },
       orderBy: {
         created_at: 'desc',
       },

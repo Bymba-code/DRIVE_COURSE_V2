@@ -4,7 +4,7 @@ const UPDATE_CATEGORY = async (req , res) => {
     try 
     {
         const {id} = req.params;
-        const {name} = req.body;
+        const {name, price, salePrice} = req.body;
 
         if(!id)
         {
@@ -14,14 +14,12 @@ const UPDATE_CATEGORY = async (req , res) => {
                 message: "Ангилалын ID байхгүй байна."
             })
         }
-        if(!name)
-        {
-            return res.status(403).json({
-                success:false,
-                data:[],
-                message:"Ангилалын шинэчлэх нэрийг оруулна уу."
-            })
-        }
+
+        let updateData = {}
+
+        if(name) updateData.name = name
+        if(price) updateData.price = parseInt(price)
+        if(salePrice) updateData.salePrice = parseInt(salePrice) 
 
         const resultOne = await prisma.category.findUnique({
             where: {
@@ -38,33 +36,16 @@ const UPDATE_CATEGORY = async (req , res) => {
             })
         }
 
-        const resultTwo = await prisma.category.findFirst({
-            where: {
-                name: name
-            }
-        })
-
-        if(resultTwo)
-        {
-            return res.status(403).json({
-                success:false,
-                data:[],
-                message:`${name} нэртэй ангилал аль хэдийн нэмэгдсэн байна.`
-            })
-        }
-
         const resultThree = await prisma.category.update({
             where: {
                 id:parseInt(id)
             },
-            data: {
-                name
-            }
+            data: updateData
         })
 
         return res.status(200).json({
             success:true,
-            data:[],
+            data:resultThree,
             message: "Амжилттай шинэчлэгдлээ."
         })
 

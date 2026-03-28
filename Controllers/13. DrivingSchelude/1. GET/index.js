@@ -2,15 +2,9 @@ const prisma = require('../../../Middlewares/prisma')
 
 const GET_ALL_DRIVING_SCHELUDE = async (req, res) => {
   try {
-    const { page, size, teacher} = req.query;
+    const { page, size } = req.query;
     const pageNum = parseInt(page);
     const sizeNum = parseInt(size);
-
-    let whereClause = {};
-    if (teacher) {
-      whereClause.teacher = parseInt(teacher); // teacherId-г өөрт тохирох талбараар солино
-    }
-
 
     let schelude;
 
@@ -19,11 +13,14 @@ const GET_ALL_DRIVING_SCHELUDE = async (req, res) => {
       schelude = await prisma.driving_schelude.findMany({
         skip,
         take: sizeNum,
-        where: whereClause,
         include: {
           teacher_driving_schelude_teacherToteacher:true,
           category_driving_schelude_categoryTocategory:true,
-          user_driving_schelude:true
+          user_driving_schelude:true,
+          cars:true
+        },
+        orderBy:{
+          id:"desc"
         }
       });
     } else {
@@ -31,7 +28,12 @@ const GET_ALL_DRIVING_SCHELUDE = async (req, res) => {
         include:{
           teacher_driving_schelude_teacherToteacher:true,
           category_driving_schelude_categoryTocategory:true,
-          user_driving_schelude:true
+          user_driving_schelude:true,
+                    cars:true
+
+        },
+        orderBy:{
+          id:"desc"
         }
       });
     }

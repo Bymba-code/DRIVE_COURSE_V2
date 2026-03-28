@@ -4,6 +4,7 @@ const ME_DRIVING_SCHELUDE = async (req, res) => {
     try {
         const user = req.user;
 
+        // Хэрэглэгчийн мэдээлэл шалгах
         const data = await prisma.users.findUnique({
             where: { id: parseInt(user.id) }
         });
@@ -16,42 +17,76 @@ const ME_DRIVING_SCHELUDE = async (req, res) => {
             });
         }
 
-        const progress = await prisma.lesson_progress.findMany({
-            where: { user: parseInt(user.id) }
+        const lastProgress = await prisma.lesson_progress.findFirst({
+            where: { user: parseInt(user.id) },
+            orderBy: { id: 'desc' }
         });
 
-        if (progress.length < 2) {
+        if (!lastProgress) {
             return res.status(403).json({
                 success: false,
                 data: [],
-                message: "Эхний хоёр хичээлийг үзсэнээр хотын жолоонд гарах хувиар сонгоно."
+                message: "Жолооны хуваарь сонгохын тулд онлайн хичээл үзнэ үү."
             });
         }
 
-            // const now = new Date();
-            // const hours = now.getHours();
+        const progressCount = await prisma.lesson_progress.count({
+            where: { user: parseInt(user.id) }
+        });
 
-            // if (hours < 21 || hours >= 24) {
-            //     // 21:00–24:00 цагийн хооронд биш бол ямар ч өгөгдөл буцаахгүй
-            //     return res.status(200).json({
-            //         success: true,
-            //         data: [],
-            //         message: "Одоогийн цаг нь 21:00–24:00 хооронд биш байна."
-            //     });
-            // }
+        if (progressCount < 2) {
+            return res.status(403).json({
+                success: false,
+                data: [],
+                message: "Эхний хоёр хичээлийг үзсэнээр хотын жолоонд гарах хуваарь сонгоно."
+            });
+        }
+
+        const takeScheduleTime = new Date(lastProgress.date);
+        takeScheduleTime.setDate(takeScheduleTime.getDate() + 1);
+        takeScheduleTime.setHours(23, 59, 59, 999);
+
+        const now = new Date();
+
+        if (now > takeScheduleTime) {
+            return res.status(403).json({
+                success: false,
+                data: [],
+                message: "Хуваарь сонгох хугацаа дууссан байна. Дахин хичээл үзнэ үү."
+            });
+        }
+
+        const hours = now.getHours();
+        if (hours < 21 || hours >= 24) {
+            return res.status(403).json({
+                success: false,
+                data: [],
+                message: "Хуваарь сонгох цаг 21:00-24:00 хооронд байна."
+            });
+        }
 
         const schelude = await prisma.driving_schelude.findMany({
+            where: {
+                schelude_date: {
+                    gte: now 
+                }
+            },
             include: {
                 teacher_driving_schelude_teacherToteacher: true,
                 category_driving_schelude_categoryTocategory: true,
-                user_driving_schelude: true
+                user_driving_schelude: true,
+                cars: true
+            },
+            orderBy: {
+                schelude_date: "asc" 
             }
         });
 
         return res.status(200).json({
             success: true,
             data: schelude,
-            message: "Амжилттай"
+            message: "Амжилттай",
+            canSelectUntil: takeScheduleTime 
         });
 
     } catch (err) {

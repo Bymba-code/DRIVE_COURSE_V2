@@ -8,9 +8,6 @@ const ME_TEACHER = async (req, res) => {
         const data = await prisma.teacher.findUnique({
             where: {
                 id: parseInt(teacher.id)
-            },
-            include:{
-                teacher_category_teacher_category_teacherToteacher:true
             }
         })
 

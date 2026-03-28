@@ -3,8 +3,10 @@ const prisma = new PrismaClient()
 
 const GET_ALL_STATS = async (req, res) => {
     try {
+        // 1. Нийт хэрэглэгчдийн тоо
         const totalUsers = await prisma.users.count()
 
+        // 2. Нийт өгсөн тест (exam_test)
         const totalExamsCompleted = await prisma.exam_test.count()
 
         // 3. Өнөөдрийн огноо бэлтгэх
@@ -20,7 +22,7 @@ const GET_ALL_STATS = async (req, res) => {
                     gte: today,
                     lt: tomorrow
                 }
-            },
+            }
         })
 
         // 5. Амжилтын хувь тооцоолох (isSuccess = 1)
