@@ -6,7 +6,6 @@ const Authorize = require("../../Middlewares/authorization")
 const LOGOUT = require("../../Controllers/1. Auth/3. Logout")
 const LOGIN_TEACHER = require("../../Controllers/1. Auth/4. TeacherLogin")
 const STUDENT_REGISTER = require("../../Controllers/1. Auth/5. StudentRegister")
-const STUDENT_REGISTER_V2 = require("../../Controllers/1. Auth/6. StudentRegisterV2")
 
 const router = express.Router()
 
@@ -22,8 +21,5 @@ router.route("/login/teacher")
 
 router.route("/student/register")
 .post(STUDENT_REGISTER)
-
-router.route("/student/registerv2")
-.post(STUDENT_REGISTER_V2)
 
 module.exports = router

@@ -3,8 +3,6 @@ const express = require("express")
 const cors = require("cors")
 const cookieParser = require("cookie-parser")
 
-
-
 const authRoutes = require("./routes/1. Auth")
 const categoryRoutes = require("./routes/2. Category")
 const topicRoutes = require("./routes/3. Topic")
@@ -36,6 +34,15 @@ const replyRoutes = require('./routes/29. Reply')
 const reactionRoutes = require('./routes/30. Reactions')
 const profileRoutes = require("./routes/31. Profile")
 const leaderboardRoutes = require("./routes/32. Leaderboards")
+const carRoutes = require("./routes/33. Cars")
+const cityRoutes = require("./routes/34. City")
+const districtRoutes = require("./routes/35. District")
+const wardsRoute = require("./routes/36. Wards")
+const genderRoute = require("./routes/37. Gender")
+const bloodTypeRoute = require("./routes/38. BloodType")
+const informationRoute = require("./routes/39. Information")
+const userCategoryRoute = require("./routes/41. UserCategory")
+const userCategoryPaymentRoute = require("./routes/42. UserCategoryPayment")
 
 
 const app = express()
@@ -44,12 +51,12 @@ const corsOptions = {
     origin: [
         "http://localhost:5173",
         "http://localhost:5174",
-        "http://localhost:5175",
         "https://omn1club.com",
         "https://system.tsogttsug.com",
         "http://system.tsogttsug.com",
         "https://tsogttsug.com",
-        "https://student.tsogttsug.com" 
+        "https://student.tsogttsug.com" ,
+        "http://localhost:5175" 
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -96,11 +103,15 @@ app.use("/api/v1", replyRoutes)
 app.use("/api/v1", reactionRoutes)
 app.use("/api/v1", profileRoutes)
 app.use("/api/v1", leaderboardRoutes)
-
-
-
-
-
+app.use("/api/v1", carRoutes)
+app.use("/api/v1", cityRoutes)
+app.use("/api/v1", districtRoutes)
+app.use("/api/v1", wardsRoute)
+app.use("/api/v1", genderRoute)
+app.use("/api/v1", bloodTypeRoute)
+app.use("/api/v1", informationRoute)
+app.use("/api/v1", userCategoryRoute)
+app.use("/api/v1", userCategoryPaymentRoute)
 
 app.listen(process.env.PORT , () => {
     console.log("APP LISTENING " + " " + process.env.PORT)

@@ -12,7 +12,7 @@ const authMiddleware = require("../../Middlewares/authCookie")
 const router = express.Router()
 
 router.route("/exam")
-.get(authMiddleware, Authorize(["admin"]), GET_ALL_EXAM)
+.get(authMiddleware, GET_ALL_EXAM)
 .post(authMiddleware, INSERT_EXAM)
 
 router.route("/exam/:id")
